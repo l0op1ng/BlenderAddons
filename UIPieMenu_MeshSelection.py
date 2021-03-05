@@ -38,9 +38,9 @@ def remove_hotkeys():
 
 
 # Define Class Object Mode
-class ClassObject(bpy.types.Operator):
-    bl_idname = "class.object"
-    bl_label = "Class Object"
+class LOOP_OT_select_object(bpy.types.Operator):
+    bl_idname = "select.object"
+    bl_label = "l0op: Select Object"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -54,9 +54,9 @@ class ClassObject(bpy.types.Operator):
 
 
 # Define Class Vertex
-class ClassVertex(bpy.types.Operator):
-    bl_idname = "class.vertex"
-    bl_label = "Class Vertex"
+class LOOP_OT_select_vertex(bpy.types.Operator):
+    bl_idname = "loop.select_vertex"
+    bl_label = "l0op: Select Vertex"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -71,9 +71,9 @@ class ClassVertex(bpy.types.Operator):
 
 
 # Define Class Edge
-class ClassEdge(bpy.types.Operator):
-    bl_idname = "class.edge"
-    bl_label = "Class Edge"
+class LOOP_OT_select_edge(bpy.types.Operator):
+    bl_idname = "loop.select_edge"
+    bl_label = "l0op: Select Edge"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -88,9 +88,9 @@ class ClassEdge(bpy.types.Operator):
 
 
 # Define Class Face
-class ClassFace(bpy.types.Operator):
-    bl_idname = "class.face"
-    bl_label = "Class Face"
+class LOOP_OT_select_face(bpy.types.Operator):
+    bl_idname = "loop.select_face"
+    bl_label = "Select Face"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -105,66 +105,66 @@ class ClassFace(bpy.types.Operator):
 
 
 # Pie menu definition for mesh component selection
-class PieMenuSelectionMesh(Menu):
-    # tips : never put capital letters in the bl_idname
-    bl_idname = 'l0op.selection_mesh'
-    bl_label = 'l0op: Mesh Component Selection'
+class LOOP_MT_PIE_selection_mesh(bpy.types.Menu):
+    """Pie menu to change selection mode in edit mode for mesh"""
+    bl_idname = 'LOOP_MT_PIE_selection_mesh'
+    bl_label = 'l0op: Edit Mesh Selection'
 
     def draw(self, context):
         pie = self.layout.menu_pie()
-        #pie.operator_enum("mesh.select_mode", "type")
         # 4 - LEFT
-        pie.operator("class.vertex", text="Vertex", icon='VERTEXSEL')
+        pie.operator(LOOP_OT_select_vertex.bl_idname, text="Vertex", icon='VERTEXSEL')
         # 6 - RIGHT
-        pie.operator("class.face", text="Face", icon='FACESEL')
+        pie.operator(LOOP_OT_select_face.bl_idname, text="Face", icon='FACESEL')
         # 2 - BOTTOM
-        pie.operator("class.edge", text="Edge", icon='EDGESEL')
+        pie.operator(LOOP_OT_select_edge.bl_idname, text="Edge", icon='EDGESEL')
         # 8 - TOP
-        pie.operator("class.object", text="Edit/Object", icon='OBJECT_DATAMODE')
+        pie.operator(LOOP_OT_select_object.bl_idname, text="Edit/Object", icon='OBJECT_DATAMODE')
 
 
-class PieMenuSelectionObject(Menu):
-    bl_idname = 'l0op.selection_object'
-    bl_label = 'l0op: Object Selection'
+class LOOP_MT_PIE_selection_object(bpy.types.Menu):
+    """Pie Menu to select faster in object mode"""
+    bl_idname = 'LOOP_MT_PIE_selection_object'
+    bl_label = 'l0op: Object Mesh Selection'
 
     def draw(self, context):
         pie = self.layout.menu_pie()
         obj = context.active_object
         if obj.type == 'MESH':
             # 4 - LEFT
-            pie.operator("class.vertex", text="Vertex", icon='VERTEXSEL')
+            pie.operator(LOOP_OT_select_vertex.bl_idname, text="Vertex", icon='VERTEXSEL')
             # 6 - RIGHT
-            pie.operator("class.face", text="Face", icon='FACESEL')
+            pie.operator(LOOP_OT_select_face.bl_idname, text="Face", icon='FACESEL')
             # 2 - BOTTOM
-            pie.operator("class.edge", text="Edge", icon='EDGESEL')
+            pie.operator(LOOP_OT_select_edge.bl_idname, text="Edge", icon='EDGESEL')
             # 8 - TOP
-            pie.operator("class.object", text="Edit/Object", icon='OBJECT_DATAMODE')
+            pie.operator(LOOP_OT_select_object.bl_idname, text="Edit/Object", icon='OBJECT_DATAMODE')
 
 
 def register():
-    bpy.utils.register_class(ClassObject)
-    bpy.utils.register_class(ClassVertex)
-    bpy.utils.register_class(ClassEdge)
-    bpy.utils.register_class(ClassFace)
+    bpy.utils.register_class(LOOP_OT_select_object)
+    bpy.utils.register_class(LOOP_OT_select_vertex)
+    bpy.utils.register_class(LOOP_OT_select_edge)
+    bpy.utils.register_class(LOOP_OT_select_face)
 
-    bpy.utils.register_class(PieMenuSelectionMesh)
-    bpy.utils.register_class(PieMenuSelectionObject)
-    add_hotkey(idName=PieMenuSelectionMesh.bl_idname, category='Mesh', key='RIGHTMOUSE', altStatus=True)
-    add_hotkey(idName=PieMenuSelectionObject.bl_idname, category='Object Mode', key='RIGHTMOUSE', altStatus=True)
+    bpy.utils.register_class(LOOP_MT_PIE_selection_mesh)
+    bpy.utils.register_class(LOOP_MT_PIE_selection_object)
+    add_hotkey(idName=LOOP_MT_PIE_selection_mesh.bl_idname, category='Mesh', key='RIGHTMOUSE', altStatus=True)
+    add_hotkey(idName=LOOP_MT_PIE_selection_object.bl_idname, category='Object Mode', key='RIGHTMOUSE', altStatus=True)
 
 
 def unregister():
-    bpy.utils.unregister_class(ClassObject)
-    bpy.utils.unregister_class(ClassVertex)
-    bpy.utils.unregister_class(ClassEdge)
-    bpy.utils.unregister_class(ClassFace)
+    bpy.utils.unregister_class(LOOP_OT_select_object)
+    bpy.utils.unregister_class(LOOP_OT_select_vertex)
+    bpy.utils.unregister_class(LOOP_OT_select_edge)
+    bpy.utils.unregister_class(LOOP_OT_select_face)
 
-    bpy.utils.unregister_class(PieMenuSelectionMesh)
-    bpy.utils.unregister_class(PieMenuSelectionObject)
+    bpy.utils.unregister_class(LOOP_MT_PIE_selection_mesh)
+    bpy.utils.unregister_class(LOOP_MT_PIE_selection_object)
     remove_hotkeys()
 
 
 if __name__ == "__main__":
     register()
 
-    bpy.ops.wm.call_menu_pie(name=PieMenuSelectionMesh.bl_idname)
+    bpy.ops.wm.call_menu_pie(name=LOOP_MT_PIE_selection_mesh.bl_idname)
