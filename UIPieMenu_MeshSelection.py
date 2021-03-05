@@ -1,5 +1,5 @@
 import bpy
-from bpy.types import Menu
+from bpy.props import StringProperty, IntProperty, BoolProperty
 
 bl_info = {
     "name": "L0op Pie Menu for Selection",
@@ -44,7 +44,6 @@ class LOOP_OT_select_object(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        layout = self.layout
 
         if bpy.context.object.mode == "OBJECT":
             bpy.ops.object.mode_set(mode="EDIT")
@@ -60,7 +59,6 @@ class LOOP_OT_select_vertex(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        layout = self.layout
 
         if bpy.context.object.mode != "EDIT":
             bpy.ops.object.mode_set(mode="EDIT")
@@ -77,7 +75,6 @@ class LOOP_OT_select_edge(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        layout = self.layout
 
         if bpy.context.object.mode != "EDIT":
             bpy.ops.object.mode_set(mode="EDIT")
@@ -94,7 +91,6 @@ class LOOP_OT_select_face(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        layout = self.layout
 
         if bpy.context.object.mode != "EDIT":
             bpy.ops.object.mode_set(mode="EDIT")
@@ -141,6 +137,50 @@ class LOOP_MT_PIE_selection_object(bpy.types.Menu):
             pie.operator(LOOP_OT_select_object.bl_idname, text="Edit/Object", icon='OBJECT_DATAMODE')
 
 
+class LOOP_addon_preferences(bpy.types.AddonPreferences):
+    # this must match the add-on name, use '__package__'
+    # when defining this in a submodule of a python package.
+    bl_idname = __name__
+
+    filepath: bpy.props.StringProperty(
+        name="Example File Path",
+        subtype='FILE_PATH',
+    )
+    number: bpy.props.IntProperty(
+        name="Example Number",
+        default=4,
+    )
+    boolean: bpy.props.BoolProperty(
+        name="Example Boolean",
+        default=False,
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text="This is a preferences view for our add-on")
+        layout.prop(self, "filepath")
+        layout.prop(self, "number")
+        layout.prop(self, "boolean")
+
+
+class LOOP_OT_addon_prefs_example(bpy.types.Operator):
+    """Display example preferences"""
+    bl_idname = "object.addon_prefs_example"
+    bl_label = "Add-on Preferences Example"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        preferences = context.preferences
+        addon_prefs = preferences.addons[__name__].preferences
+
+        info = ("Path: %s, Number: %d, Boolean %r" %
+                (addon_prefs.filepath, addon_prefs.number, addon_prefs.boolean))
+
+        self.report({'INFO'}, info)
+        print(info)
+
+        return {'FINISHED'}
+
 def register():
     bpy.utils.register_class(LOOP_OT_select_object)
     bpy.utils.register_class(LOOP_OT_select_vertex)
@@ -152,6 +192,8 @@ def register():
     add_hotkey(idName=LOOP_MT_PIE_selection_mesh.bl_idname, category='Mesh', key='RIGHTMOUSE', altStatus=True)
     add_hotkey(idName=LOOP_MT_PIE_selection_object.bl_idname, category='Object Mode', key='RIGHTMOUSE', altStatus=True)
 
+    bpy.utils.register_class(LOOP_OT_addon_prefs_example)
+    bpy.utils.register_class(LOOP_addon_preferences)
 
 def unregister():
     bpy.utils.unregister_class(LOOP_OT_select_object)
@@ -161,6 +203,10 @@ def unregister():
 
     bpy.utils.unregister_class(LOOP_MT_PIE_selection_mesh)
     bpy.utils.unregister_class(LOOP_MT_PIE_selection_object)
+
+    bpy.utils.unregister_class(LOOP_OT_addon_prefs_example)
+    bpy.utils.unregister_class(LOOP_addon_preferences)
+
     remove_hotkeys()
 
 
