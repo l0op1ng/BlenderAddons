@@ -119,6 +119,8 @@ class PieMenuSelectionMesh(Menu):
         pie.operator("class.face", text="Face", icon='FACESEL')
         # 2 - BOTTOM
         pie.operator("class.edge", text="Edge", icon='EDGESEL')
+        # 8 - TOP
+        pie.operator("class.object", text="Edit/Object", icon='OBJECT_DATAMODE')
 
 
 class PieMenuSelectionObject(Menu):
@@ -129,14 +131,18 @@ class PieMenuSelectionObject(Menu):
         pie = self.layout.menu_pie()
         obj = context.active_object
         if obj.type == 'MESH':
+            # 4 - LEFT
             pie.operator("class.vertex", text="Vertex", icon='VERTEXSEL')
             # 6 - RIGHT
             pie.operator("class.face", text="Face", icon='FACESEL')
             # 2 - BOTTOM
             pie.operator("class.edge", text="Edge", icon='EDGESEL')
+            # 8 - TOP
+            pie.operator("class.object", text="Edit/Object", icon='OBJECT_DATAMODE')
 
 
 def register():
+    bpy.utils.register_class(ClassObject)
     bpy.utils.register_class(ClassVertex)
     bpy.utils.register_class(ClassEdge)
     bpy.utils.register_class(ClassFace)
@@ -148,6 +154,7 @@ def register():
 
 
 def unregister():
+    bpy.utils.unregister_class(ClassObject)
     bpy.utils.unregister_class(ClassVertex)
     bpy.utils.unregister_class(ClassEdge)
     bpy.utils.unregister_class(ClassFace)
