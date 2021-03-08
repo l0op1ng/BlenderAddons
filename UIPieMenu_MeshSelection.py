@@ -155,12 +155,18 @@ class LOOP_addon_preferences(bpy.types.AddonPreferences):
         default=False,
     )
 
+    boolean2: bpy.props.BoolProperty(
+        name="Example Boolean2",
+        default=False,
+    )
+
     def draw(self, context):
         layout = self.layout
         layout.label(text="This is a preferences view for our add-on")
         layout.prop(self, "filepath")
         layout.prop(self, "number")
         layout.prop(self, "boolean")
+        layout.prop(self, "boolean2")
 
 
 class LOOP_OT_addon_prefs_example(bpy.types.Operator):
