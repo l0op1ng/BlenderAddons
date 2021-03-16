@@ -1,40 +1,4 @@
 import bpy
-from bpy.props import StringProperty, IntProperty, BoolProperty
-
-bl_info = {
-    "name": "L0op Pie Menu for Selection",
-    "author": "l0op1ng",
-    "version": (0, 0, 0, 1),
-    "description": "Adds Pie Menus for quick selection",
-    "blender": (2, 90, 0),
-    "warning": "WIP",
-    "wiki_url": "",
-    "category": "l0op1ng Tools"
-}
-
-# Store keymaps to remove them later
-addon_keymaps = []
-
-
-def add_hotkey(idName: str, category: str, key: str, ctrlStatus=False, altStatus=False, shiftStatus=False):
-    wm = bpy.context.window_manager
-    kc = wm.keyconfigs.addon
-
-    if not kc:
-        print('Keymap Error')
-        return
-
-    km = kc.keymaps.new(name=category, space_type='EMPTY')
-    kmi = km.keymap_items.new('wm.call_menu_pie', key, 'PRESS', ctrl=ctrlStatus, alt=altStatus, shift=shiftStatus)
-    kmi.properties.name = idName
-    addon_keymaps.append((km, kmi))
-
-
-def remove_hotkeys():
-    for km, kmi in addon_keymaps:
-        km.keymap_items.remove(kmi)
-
-    addon_keymaps.clear()
 
 
 # Define Class Object Mode
@@ -137,86 +101,26 @@ class LOOP_MT_PIE_selection_object(bpy.types.Menu):
             pie.operator(LOOP_OT_select_object.bl_idname, text="Edit/Object", icon='OBJECT_DATAMODE')
 
 
-class LOOP_addon_preferences(bpy.types.AddonPreferences):
-    # this must match the add-on name, use '__package__'
-    # when defining this in a submodule of a python package.
-    bl_idname = __name__
+CLASSES = [LOOP_OT_select_object,
+           LOOP_OT_select_vertex,
+           LOOP_OT_select_edge,
+           LOOP_OT_select_face
+           ]
 
-    filepath: bpy.props.StringProperty(
-        name="Example File Path",
-        subtype='FILE_PATH',
-    )
-    number: bpy.props.IntProperty(
-        name="Example Number",
-        default=4,
-    )
-    boolean: bpy.props.BoolProperty(
-        name="Example Boolean",
-        default=False,
-    )
-
-    boolean2: bpy.props.BoolProperty(
-        name="Example Boolean2",
-        default=False,
-    )
-
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="This is a preferences view for our add-on")
-        layout.prop(self, "filepath")
-        layout.prop(self, "number")
-        layout.prop(self, "boolean")
-        layout.prop(self, "boolean2")
-
-
-class LOOP_OT_addon_prefs_example(bpy.types.Operator):
-    """Display example preferences"""
-    bl_idname = "object.addon_prefs_example"
-    bl_label = "Add-on Preferences Example"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        preferences = context.preferences
-        addon_prefs = preferences.addons[__name__].preferences
-
-        info = ("Path: %s, Number: %d, Boolean %r" %
-                (addon_prefs.filepath, addon_prefs.number, addon_prefs.boolean))
-
-        self.report({'INFO'}, info)
-        print(info)
-
-        return {'FINISHED'}
 
 def register():
-    bpy.utils.register_class(LOOP_OT_select_object)
-    bpy.utils.register_class(LOOP_OT_select_vertex)
-    bpy.utils.register_class(LOOP_OT_select_edge)
-    bpy.utils.register_class(LOOP_OT_select_face)
+    for cls in CLASSES:
+        try:
+            bpy.utils.register_class(cls)
+        except:
+            print(f"{cls.__name__} already registred")
 
-    bpy.utils.register_class(LOOP_MT_PIE_selection_mesh)
-    bpy.utils.register_class(LOOP_MT_PIE_selection_object)
-    add_hotkey(idName=LOOP_MT_PIE_selection_mesh.bl_idname, category='Mesh', key='RIGHTMOUSE', altStatus=True)
-    add_hotkey(idName=LOOP_MT_PIE_selection_object.bl_idname, category='Object Mode', key='RIGHTMOUSE', altStatus=True)
-
-    bpy.utils.register_class(LOOP_OT_addon_prefs_example)
-    bpy.utils.register_class(LOOP_addon_preferences)
 
 def unregister():
-    bpy.utils.unregister_class(LOOP_OT_select_object)
-    bpy.utils.unregister_class(LOOP_OT_select_vertex)
-    bpy.utils.unregister_class(LOOP_OT_select_edge)
-    bpy.utils.unregister_class(LOOP_OT_select_face)
-
-    bpy.utils.unregister_class(LOOP_MT_PIE_selection_mesh)
-    bpy.utils.unregister_class(LOOP_MT_PIE_selection_object)
-
-    bpy.utils.unregister_class(LOOP_OT_addon_prefs_example)
-    bpy.utils.unregister_class(LOOP_addon_preferences)
-
-    remove_hotkeys()
+    for cls in CLASSES:
+        if hasattr(bpy.types, cls.__name__):
+            bpy.utils.unregister_class(cls)
 
 
 if __name__ == "__main__":
     register()
-
-    bpy.ops.wm.call_menu_pie(name=LOOP_MT_PIE_selection_mesh.bl_idname)

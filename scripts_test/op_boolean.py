@@ -111,16 +111,39 @@ class OBJECT_OT_Boolean(bpy.types.Operator):
     bl_label = "Boolean"
     bl_description = "Performs selected Boolean operation on active object"
 
+    # Blender uses the poll() function to check, if this operator is available for the current context.
+    # When it returns False its control is grayed out
+    @classmethod
+    def poll(cls, context):
+        return context.mode == 'OBJECT'
+
     def execute(self, context):
-        main('DIFFERENCE', custom_context=context)
+        main('DIFFERENCE', apply_objects=False, custom_context=context)
         return {'FINISHED'}
+
+    def invoke(self, context, event):
+        result = main('DIFFERENCE', apply_objects=False, custom_context=context)
+        if result[0] == SUCCESS:
+            return {'FINISHED'}
+        else:
+            print(result)
+            self.report(type={result[0]}, message=result[1])
+            return {'FINISHED' if result[0] == WARNING else 'CANCELLED'}
+
+1
+def menu_draw(self, context):
+    # this line tell blender to use the invoke() method instead of the default execute()
+    self.layout.operator_context = 'INVOKE_REGION_WIN'
+    self.layout.operator(OBJECT_OT_Boolean.bl_idname)
 
 
 def register():
     register_class(OBJECT_OT_Boolean)
+    bpy.types.VIEW3D_MT_object.prepend(menu_draw)
 
 
 def unregister():
+    bpy.types.VIEW3D_MT_object.remove(menu_draw)
     unregister_class(OBJECT_OT_Boolean)
 
 

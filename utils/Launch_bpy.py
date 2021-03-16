@@ -1,5 +1,5 @@
 # single file
-filename = "F:/Projects/Git/BlenderAddons/op_boolean.py"
+filename = "../scripts_test/op_boolean.py"
 exec(compile(open(filename).read(), filename, 'exec'))
 
 # script in a module
